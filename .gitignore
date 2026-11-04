@@ -1,0 +1,24 @@
+# Dependencies
+node_modules/
+
+# Local environment secrets
+.env
+.env.local
+
+# Local upload scratch space (production images live in Cloudinary)
+server/uploads/*
+!server/uploads/.gitkeep
+
+# Build output
+client/dist/
+dist/
+
+# Logs
+*.log
+npm-debug.log*
+
+# Editor / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
