@@ -19,6 +19,9 @@ const toList = (value) =>
 
 export const env = {
   port: Number(process.env.PORT),
+  // Undefined means "every interface" (Node's default dual-stack bind), which is
+  // what Render needs. Set HOST=0.0.0.0 to force IPv4-only.
+  bindHost: process.env.HOST || undefined,
   nodeEnv: process.env.NODE_ENV || 'development',
   isProd: process.env.NODE_ENV === 'production',
   mongoUri: process.env.MONGODB_URI,

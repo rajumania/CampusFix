@@ -3,7 +3,7 @@ import cors from 'cors';
 import morgan from 'morgan';
 import mongoose from 'mongoose';
 import { env } from './config/env.js';
-import { connectDB, redact } from './config/db.js';
+import { connectDB, logConnectionFailure, redact } from './config/db.js';
 import apiRoutes from './routes/index.js';
 import { errorHandler, notFound } from './middleware/errorHandler.js';
 
@@ -48,14 +48,15 @@ async function start() {
     await connectDB();
   } catch (err) {
     console.error(`[server] MongoDB connection failed: ${redact(err.message)}`);
-    console.error('[server] Check MONGODB_URI, that the database user has readWrite on "campusfix",');
-    console.error('[server] and that this machine\'s IP is allowed in Atlas Network Access.');
+    // The diagnosis walks the driver's cause chain and names the actual failure
+    // class, so "wrong password" and "IP not allowed" stop looking identical.
+    logConnectionFailure(err);
     process.exit(1);
   }
 
-  const server = app.listen(env.port, () => {
+  const server = app.listen(env.port, env.bindHost, () => {
     console.log(`[server] CampusFix API listening on http://localhost:${env.port}`);
-    console.log(`[server] environment: ${env.nodeEnv} | database: ${env.mongoDatabase}`);
+    console.log(`[server] bind=${env.bindHost ?? 'all interfaces (dual-stack)'} | env=${env.nodeEnv} | database=${env.mongoDatabase}`);
   });
 
   const shutdown = (signal) => {
